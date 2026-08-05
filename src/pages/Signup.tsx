@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
+import axios from 'axios';
 import { signup } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,7 +13,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     try {
@@ -20,14 +21,18 @@ export default function Signup() {
       localStorage.setItem('access_token', data.access_token);
       setUser({ id: data.id, email, username, avatarUrl: null });
       navigate('/chats');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Signup failed');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Signup failed');
+      } else {
+        setError('Signup failed');
+      }
     }
   };
 
   return (
     <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8 }}>
-      <Typography variant="h5" mb={2}>Sign Up</Typography>
+      <Typography variant="h5" sx={{ mb: 2 }}>Sign Up</Typography>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       <form onSubmit={handleSubmit}>
         <TextField label="Email" fullWidth margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} />
