@@ -34,11 +34,26 @@ export default function Login() {
     <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8 }}>
       <Typography variant="h5" sx={{ mb: 2 }}>Login</Typography>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      
       <form onSubmit={handleSubmit}>
         <TextField label="Username" fullWidth margin="normal" value={username} onChange={(e) => setUsername(e.target.value)} />
         <TextField label="Password" type="password" fullWidth margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} />
         <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>Login</Button>
       </form>
+
+      <Box sx={{ mt: 2, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          Don't have an account?{' '}
+          <Button 
+            variant="text" 
+            size="small" 
+            onClick={() => navigate('/signup')}
+            sx={{ textTransform: 'none', fontWeight: 'bold' }}
+          >
+            Sign Up
+          </Button>
+        </Typography>
+      </Box>
     </Box>
   );
 }

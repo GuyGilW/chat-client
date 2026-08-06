@@ -3,7 +3,8 @@ import {useAuth } from './context/AuthContext';
 import {AuthProvider} from './context/AuthProvider'
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import {theme} from './theme/theme'
 function AppRoutes() {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
@@ -20,10 +21,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline>
     <BrowserRouter>
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
+    </CssBaseline>
+    </ThemeProvider>
   );
 }
