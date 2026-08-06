@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import {theme} from './theme/theme'
 import ChatList from './pages/ChatList';
+import NewChat from './pages/NewChat';
 
 
 function AppRoutes() {
@@ -17,6 +18,7 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/chats" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/chats" /> : <Signup />} />
       <Route path="/chats" element={user ? <ChatList /> : <Navigate to="/login" />} />
+      <Route path="/chats/new" element= {user ? <NewChat/> :  <Navigate to="/login"/> } /> 
       <Route path="*" element={<Navigate to={user ? '/chats' : '/login'} />} />
     </Routes>
   );
