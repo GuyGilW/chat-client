@@ -5,9 +5,9 @@ export async function makeChat(creatorId: number, name: string | undefined, isGr
   return res.data;
 }
 
-export async function findChats(chatId: number, requesterId: number, newUserId: number)
+export async function findChats(chatId: number,  newUserId: number)
 {
-    const res = await api.post('/chats/findallUser', {chatId, requesterId, newUserId});
+    const res = await api.post('/chats/findallUser', {chatId,  newUserId});
     return res.data;
 }
 
@@ -21,14 +21,14 @@ export async function getChat(chatId: number) {
   return res.data;
 }
 
-export async function leaveChat(chatId: number, userId: number) {
-  const res = await api.post(`/chats/${chatId}/leave`, {userId});
+export async function leaveChat(chatId: number ){
+  const res = await api.post(`/chats/${chatId}/leave`);
   return res.data;
 }
 
-export async function removeMember(chatId: number, requesterId: number,
+export async function removeMember(chatId: number, 
     targetUserId: number, ) {
-  const res = await api.post(`/chats/${chatId}/leave`, {requesterId, targetUserId});
+  const res = await api.post(`/chats/${chatId}/leave`, { targetUserId});
   return res.data;
 }
 
