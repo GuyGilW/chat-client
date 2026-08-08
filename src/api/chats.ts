@@ -1,7 +1,7 @@
 import {api} from './client'; 
 
-export async function makeChat(creatorId: number, name: string | undefined, isGroup: boolean, memberIds: number[]) {
-  const res = await api.post('/chats/make', { creatorId, name, isGroup, memberIds});
+export async function makeChat(creatorId: number, name: string | undefined, isGroup: boolean, usernames: string[]) {
+  const res = await api.post('/chats/make', { creatorId, name, isGroup, usernames});
   return res.data;
 }
 

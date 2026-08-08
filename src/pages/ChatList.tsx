@@ -51,11 +51,9 @@ export default function ChatList() {
       const selfUsername = selfMember?.user?.username || user?.username || 'You';
       return {
         title: `${selfUsername} (You)`,
-        subtitle: 'Note to self',
         avatarUrl: selfMember?.user?.avatarUrl,
       };
     }
-
     return {
       title: otherMember.user?.username || 'Direct Message',
       subtitle: 'Direct Message',

@@ -20,7 +20,7 @@ export default function NewChat() {
 
   const [isGroup, setIsGroup] = useState(false);
   const [groupName, setGroupName] = useState('');
-  const [memberIdsInput, setMemberIdsInput] = useState('');
+  const [usernamesInput, setUsernamesIput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -34,15 +34,15 @@ export default function NewChat() {
     setLoading(true);
 
     try {
-      const memberIds = memberIdsInput
+      const usernames = usernamesInput
         .split(',')
-        .map((id) => Number(id.trim()))
-        .filter((id) => !isNaN(id) && id > 0);
+        .map((username) => username.trim())
+        .filter(Boolean);
 
       const name = isGroup ? groupName.trim() : undefined;
 
-      if (!isGroup && memberIds.length === 0) {
-        setError('Please enter a valid User ID');
+      if (!isGroup &&  usernames.length === 0) {
+        setError('Please enter a valid Username');
         setLoading(false);
         return;
       }
@@ -53,7 +53,7 @@ export default function NewChat() {
         return;
       }
 
-      const chat = await makeChat(user.id, name, isGroup, memberIds);
+      const chat = await makeChat(name, isGroup, usernames);
       navigate(`/chats/${chat.id}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -108,22 +108,22 @@ export default function NewChat() {
             onChange={(e) => setGroupName(e.target.value)}
           />
           <TextField
-            label="Member User IDs (comma-separated)"
+            label="Usernames (comma-separated)"
             placeholder="e.g. 2, 5, 8"
             fullWidth
             margin="normal"
-            value={memberIdsInput}
-            onChange={(e) => setMemberIdsInput(e.target.value)}
+            value={usernamesInput}
+            onChange={(e) => setUsernamesIput(e.target.value)}
           />
         </>
       ) : (
         <TextField
-          label="User ID to chat with"
-          type="number"
+          label="Enter username of user"
+          type="string"
           fullWidth
           margin="normal"
-          value={memberIdsInput}
-          onChange={(e) => setMemberIdsInput(e.target.value)}
+          value={usernamesInput}
+          onChange={(e) => setUsernamesIput(e.target.value)}
         />
       )}
 
