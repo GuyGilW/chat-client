@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 import axios from 'axios';
-import { signup } from '../api/auth';
+import { signup, getMe } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
 export default function Signup() {
@@ -19,7 +19,8 @@ export default function Signup() {
     try {
       const data = await signup(email, username, password);
       localStorage.setItem('access_token', data.access_token);
-      setUser({ id: data.id, email, username, avatarUrl: null });
+      const me = await getMe();
+      setUser(me);
       navigate('/chats');
     } catch (err) {
       if (axios.isAxiosError(err)) {
