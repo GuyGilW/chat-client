@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { getMe } from '../api/auth';
 import { AuthContext} from './AuthContext';
 import type {User} from './AuthContext'
+import { connectSocket } from '../api/socket';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -13,7 +14,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!token) return; 
 
     getMe()
-      .then(setUser)
+      .then((user) => 
+      {
+        setUser(user);
+        connectSocket(token);
+      })
       .catch(() => localStorage.removeItem('access_token'))
       .finally(() => setLoading(false));
   }, []);
