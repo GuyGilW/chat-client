@@ -32,3 +32,9 @@ export async function updateAvatar(formData: FormData)
   }); 
     return res.data; 
 }
+
+export function  avatarUrl (path: string | null) {
+
+  return path ? `${import.meta.env.VITE_API_URL}${path}` : undefined;
+
+}

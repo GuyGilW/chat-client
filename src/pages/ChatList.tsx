@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { List, ListItemButton, ListItemText, Avatar, Box, Typography, Button, CircularProgress } from '@mui/material';
 import { getChats } from '../api/chats';
 import { useAuth } from '../context/AuthContext';
+import { avatarUrl } from '../api/user';
 
 interface UserProfile {
   id: number;
@@ -22,6 +23,7 @@ interface Chat {
   isGroup: boolean;
   members: ChatMember[];
 }
+
 
 export default function ChatList() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -51,13 +53,13 @@ export default function ChatList() {
       const selfUsername = selfMember?.user?.username || user?.username || 'You';
       return {
         title: `${selfUsername} (You)`,
-        avatarUrl: selfMember?.user?.avatarUrl,
+        avatarUrl: avatarUrl(selfMember?.user?.avatarUrl ?? null) ,
       };
     }
     return {
       title: otherMember.user?.username || 'Direct Message',
       subtitle: 'Direct Message',
-      avatarUrl: otherMember.user?.avatarUrl,
+      avatarUrl: avatarUrl(otherMember.user?.avatarUrl ?? null),
     };
   };
 
@@ -66,6 +68,7 @@ export default function ChatList() {
   return (
     <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Button variant="contained" onClick={() => navigate('/settings')}>Settings</Button>
         <Typography variant="h5">Your Chats</Typography>
         <Button variant="contained" onClick={() => navigate('/chats/new')}>
           New Chat

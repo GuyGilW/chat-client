@@ -5,11 +5,6 @@ export async function makeChat( name: string | undefined, isGroup: boolean, user
   return res.data;
 }
 
-export async function findChats(chatId: number,  newUserId: number)
-{
-    const res = await api.post('/chats/findallUser', {chatId,  newUserId});
-    return res.data;
-}
 
 export async function getChats() {
   const res = await api.get('/chats/get');
