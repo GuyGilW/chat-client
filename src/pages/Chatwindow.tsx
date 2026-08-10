@@ -5,6 +5,14 @@ import { findAllInChat } from '../api/message';
 import { getSocket, sendMessage as socketSendMessage, joinChat, markSeen } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
 import { avatarUrl } from '../api/user';
+import { getChat, updateGroupImage } from '../api/chats';
+
+interface Chat {
+  id: number;
+  name: string | null;
+  isGroup: boolean;
+  imageUrl: string | null;
+}
 
 interface Message {
   id: number;
@@ -19,14 +27,15 @@ export default function ChatWindow() {
   const { chatId } = useParams();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [chat, setChat] = useState<Chat | null>(null);
   const [content, setContent] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!chatId) return;
 
+    getChat(Number(chatId)).then(setChat);
     findAllInChat(Number(chatId)).then(setMessages);
-
     joinChat(Number(chatId));
 
     const socket = getSocket();
@@ -54,10 +63,27 @@ export default function ChatWindow() {
     socketSendMessage(Number(chatId), content);
     setContent('');
   };
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !chatId) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    const updated = await updateGroupImage(Number(chatId), formData);
+    setChat(updated);
+  };
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, display: 'flex', flexDirection: 'column', height: '80vh' }}>
-      <Typography variant="h6" sx={{ mb: 1 }}>Chat #{chatId}</Typography>
+      {chat?.isGroup && (
+    <>
+      <Avatar src={avatarUrl(chat.imageUrl)} />
+      <Button component="label" size="small">
+        Change Image
+        <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+      </Button>
+    </>
+  )}
+      <Typography variant="h6" sx={{ mb: 1 }}>{chat?.name || `Chat #${chatId}`}</Typography>
 
       <Paper sx={{ flex: 1, overflowY: 'auto', p: 2, mb: 2 }}>
         <List>
