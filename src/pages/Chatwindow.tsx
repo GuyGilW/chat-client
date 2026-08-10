@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, TextField, Button, Typography, List, ListItem, Paper } from '@mui/material';
+import { Box, TextField, Button, Typography, List, ListItem, Paper, Avatar } from '@mui/material';
 import { findAllInChat } from '../api/message';
 import { getSocket, sendMessage as socketSendMessage, joinChat, markSeen } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
+import { avatarUrl } from '../api/user';
 
 interface Message {
   id: number;
@@ -65,8 +66,15 @@ export default function ChatWindow() {
               key={msg.id}
               sx={{
                 justifyContent: msg.senderId === user?.id ? 'flex-end' : 'flex-start',
+                gap: 1,
               }}
             >
+              {msg.senderId !== user?.id && (
+                <Avatar 
+                 src ={avatarUrl(msg.sender.avatarUrl)}
+                 sx = {{width: 32, height: 32}}
+                /> 
+              )}
               <Box
                 sx={{
                   bgcolor: msg.senderId === user?.id ? 'primary.main' : 'grey.200',
