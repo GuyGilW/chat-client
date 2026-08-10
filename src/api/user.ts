@@ -5,23 +5,36 @@ export async function findById(id: number) {
     return res.data;
 }
 
-export async function updateUsername(newUsername: string)
+export async function updateUsername(username: string)
 {
-    const res = await api.patch('/users/updateUsername', {newUsername}
+    const res = await api.patch('/users/update/username', {username}
     ); 
     return res.data;
 }
 
 export async function updateEmail(email: string)
 {
-    const res = await api.patch('/users/updateEmail', {email}
+    const res = await api.patch('/users/update/email', {email}
     ); 
     return res.data;
 }
 
 export async function updatePassword(currentPassword: string, newPassword: string)
 {
-    const res = await api.patch('/users/updatePassword', {currentPassword, newPassword}
+    const res = await api.patch('/users/update/password', {currentPassword, newPassword}
     ); 
     return res.data;
+}
+
+export async function updateAvatar(formData: FormData)
+{
+    const res = await api.patch('/users/update/avatar', formData, {headers: { 'Content-Type': 'multipart/form-data' },
+  }); 
+    return res.data; 
+}
+
+export function  avatarUrl (path: string | null) {
+
+  return path ? `${import.meta.env.VITE_API_URL}${path}` : undefined;
+
 }
