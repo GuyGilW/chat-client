@@ -21,6 +21,7 @@ interface Chat {
   id: number;
   name: string | null;
   isGroup: boolean;
+  imageUrl?: string;
   members: ChatMember[];
 }
 
@@ -43,7 +44,7 @@ export default function ChatList() {
       return {
         title: chat.name || `Group Chat #${chat.id}`,
         subtitle: `${chat.members.length} members`,
-        avatarUrl: undefined,
+        avatarUrl: avatarUrl(chat.imageUrl ?? null),
       };
     }
     const otherMember = chat.members.find((m) => m.userId !== user?.id);
