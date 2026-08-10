@@ -7,11 +7,21 @@ import { useAuth } from '../context/AuthContext';
 import { avatarUrl } from '../api/user';
 import { getChat, updateGroupImage } from '../api/chats';
 
+interface ChatMember {
+  userId: number;
+  user: {
+    id: number;
+    username: string;
+    avatarUrl: string | null;
+  };
+}
+
 interface Chat {
   id: number;
   name: string | null;
   isGroup: boolean;
   imageUrl: string | null;
+  members?: ChatMember[];
 }
 
 interface Message {
@@ -72,18 +82,57 @@ export default function ChatWindow() {
     setChat(updated);
   };
 
+  const getHeaderInfo = () => {
+    if (!chat) return { title: `Chat #${chatId}`, src: undefined };
+
+    if (chat.isGroup) {
+      return {
+        title: chat.name || 'Group Chat',
+        src: avatarUrl(chat.imageUrl),
+      };
+    }
+
+    const members = chat.members || [];
+    const otherMember = members.find((m) => m.user.id !== user?.id);
+    const targetUser = otherMember?.user;
+
+    if (!otherMember)
+    {
+      const selfUser = members.find((m) => m.user?.id)?.user || user;
+      const username = selfUser?.username ? `${selfUser.username} (You)` : 'You';
+      return {
+        title: username,
+        src: avatarUrl(selfUser?.avatarUrl ?? null) 
+      }
+    };
+
+    return {
+      title: targetUser?.username || `Chat #${chatId}`,
+      src: avatarUrl(targetUser?.avatarUrl ?? null),
+    };
+  };
+
+  const { title: headerTitle, src: headerAvatarSrc } = getHeaderInfo();
+
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, display: 'flex', flexDirection: 'column', height: '80vh' }}>
-      {chat?.isGroup && (
-    <>
-      <Avatar src={avatarUrl(chat.imageUrl)} />
-      <Button component="label" size="small">
-        Change Image
-        <input type="file" accept="image/*" hidden onChange={handleImageChange} />
-      </Button>
-    </>
-  )}
-      <Typography variant="h6" sx={{ mb: 1 }}>{chat?.name || `Chat #${chatId}`}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Avatar src={headerAvatarSrc} sx={{ width: 44, height: 44 }}>
+          {!headerAvatarSrc && headerTitle[0]?.toUpperCase()}
+        </Avatar>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+            {headerTitle}
+          </Typography>
+          
+          {chat?.isGroup && (
+            <Button component="label" size="small" sx={{ p: 0, minWidth: 0, textTransform: 'none', fontSize: '0.75rem' }}>
+              Change Group Image
+              <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+            </Button>
+          )}
+        </Box>
+      </Box>
 
       <Paper sx={{ flex: 1, overflowY: 'auto', p: 2, mb: 2 }}>
         <List>
@@ -136,4 +185,4 @@ export default function ChatWindow() {
       </Box>
     </Box>
   );
-}
+} 
