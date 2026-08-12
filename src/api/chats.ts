@@ -33,6 +33,13 @@ export async function deleteChat(chatId: number, userId: number)
     return res.data;
 }
 
+export async function updateGroupImage(chatId: number, formData: FormData)
+{
+  const res = await api.patch(`/chats/${chatId}/image`, formData, {
+    headers: {'Content-Type': 'multipart/form-data'},
+  }); 
+  return res.data;
+}
 
 
 

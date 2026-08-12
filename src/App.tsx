@@ -7,15 +7,17 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import {theme} from './theme/theme'
 import ChatList from './pages/ChatList';
 import NewChat from './pages/NewChat';
-import ChatWindow from './pages/ChatWindow';
+import ChatWindow from './pages/Chatwindow';
 import Settings from './pages/Settings'
-
+import NavBar from './components/Navbar';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
 
   return (
+    <>
+    <NavBar/>
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/chats" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/chats" /> : <Signup />} />
@@ -25,6 +27,7 @@ function AppRoutes() {
       <Route path = "/settings" element = {user ? <Settings/> : <Navigate to="/login"/>}></Route>
       <Route path="*" element={<Navigate to={user ? '/chats' : '/login'} />} />
     </Routes>
+    </>
   );
 }
 
