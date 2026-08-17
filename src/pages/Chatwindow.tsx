@@ -6,32 +6,8 @@ import { getSocket, sendMessage as socketSendMessage, joinChat, markSeen } from 
 import { useAuth } from '../context/AuthContext';
 import { avatarUrl } from '../api/user';
 import { getChat, updateGroupImage } from '../api/chats';
-
-interface ChatMember {
-  userId: number;
-  user: {
-    id: number;
-    username: string;
-    avatarUrl: string | null;
-  };
-}
-
-interface Chat {
-  id: number;
-  name: string | null;
-  isGroup: boolean;
-  imageUrl: string | null;
-  members?: ChatMember[];
-}
-
-interface Message {
-  id: number;
-  content: string;
-  senderId: number;
-  chatId: number;
-  createdAt: string;
-  sender: { id: number; username: string; avatarUrl: string | null };
-}
+import { getChatDisplayInfo } from '../util/chatDisplay.ts';
+import type {Chat, Message} from '../types/types.ts'
 
 export default function ChatWindow() {
   const { chatId } = useParams();
@@ -82,37 +58,11 @@ export default function ChatWindow() {
     setChat(updated);
   };
 
-  const getHeaderInfo = () => {
-    if (!chat) return { title: `Chat #${chatId}`, src: undefined };
+  const headerInfo = chat
+  ? getChatDisplayInfo(chat, user?.id)
+  : { title: `Chat #${chatId}`, subtitle: '', src: undefined };
 
-    if (chat.isGroup) {
-      return {
-        title: chat.name || 'Group Chat',
-        src: avatarUrl(chat.imageUrl),
-      };
-    }
-
-    const members = chat.members || [];
-    const otherMember = members.find((m) => m.user.id !== user?.id);
-    const targetUser = otherMember?.user;
-
-    if (!otherMember)
-    {
-      const selfUser = members.find((m) => m.user?.id)?.user || user;
-      const username = selfUser?.username ? `${selfUser.username} (You)` : 'You';
-      return {
-        title: username,
-        src: avatarUrl(selfUser?.avatarUrl ?? null) 
-      }
-    };
-
-    return {
-      title: targetUser?.username || `Chat #${chatId}`,
-      src: avatarUrl(targetUser?.avatarUrl ?? null),
-    };
-  };
-
-  const { title: headerTitle, src: headerAvatarSrc } = getHeaderInfo();
+  const { title: headerTitle, src: headerAvatarSrc } = headerInfo
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, display: 'flex', flexDirection: 'column', height: '80vh' }}>
