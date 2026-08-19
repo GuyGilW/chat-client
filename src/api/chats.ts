@@ -21,6 +21,12 @@ export async function leaveChat(chatId: number ){
   return res.data;
 }
 
+export async function addMember(chatId: number, userId: number)
+{
+  const res = await api.post(`/chats/${chatId}/members/${userId}`)
+  return res.data;
+}
+
 export async function removeMember(chatId: number, 
     targetUserId: number, ) {
   const res = await api.post(`/chats/${chatId}/leave`, { targetUserId});

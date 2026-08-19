@@ -5,6 +5,12 @@ export async function findById(id: number) {
     return res.data;
 }
 
+export async function findByUsername(username: string)
+{
+    const res = await api.get(`/users/by-username/${username}`); 
+    return res.data;
+}
+
 export async function updateUsername(username: string)
 {
     const res = await api.patch('/users/update/username', {username}
