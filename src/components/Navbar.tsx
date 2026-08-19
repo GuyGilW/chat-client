@@ -2,6 +2,7 @@ import { AppBar, Toolbar, Typography, Avatar, Button, Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { avatarUrl } from '../api/user';
+import { disconnectSocket } from '../api/socket';
 
 export default function NavBar() {
     const { user, setUser } = useAuth();
@@ -10,6 +11,7 @@ export default function NavBar() {
     const handleLogout = () => {
         localStorage.removeItem('access_token');
         setUser(null);
+        disconnectSocket();
         navigate('/login');
     };
 
