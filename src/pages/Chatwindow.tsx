@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, TextField, Button, Typography, List, ListItem, Paper, Avatar } from '@mui/material';
 import { findAllInChat } from '../api/message';
 import { getSocket, sendMessage as socketSendMessage, joinChat, markSeen } from '../api/socket';
@@ -7,7 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { avatarUrl } from '../api/user';
 import { getChat, updateGroupImage } from '../api/chats';
 import { getChatDisplayInfo } from '../util/chatDisplay.ts';
-import type {Chat, Message} from '../types/types.ts'
+import type { Chat, Message } from '../types/types.ts'
+import GroupControls from '../components/GroupControls.tsx';
 
 export default function ChatWindow() {
   const { chatId } = useParams();
@@ -16,6 +17,7 @@ export default function ChatWindow() {
   const [chat, setChat] = useState<Chat | null>(null);
   const [content, setContent] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!chatId) return;
@@ -59,8 +61,8 @@ export default function ChatWindow() {
   };
 
   const headerInfo = chat
-  ? getChatDisplayInfo(chat, user?.id)
-  : { title: `Chat #${chatId}`, subtitle: '', src: undefined };
+    ? getChatDisplayInfo(chat, user?.id)
+    : { title: `Chat #${chatId}`, subtitle: '', src: undefined };
 
   const { title: headerTitle, src: headerAvatarSrc } = headerInfo
 
@@ -74,7 +76,7 @@ export default function ChatWindow() {
           <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
             {headerTitle}
           </Typography>
-          
+
           {chat?.isGroup && (
             <Button component="label" size="small" sx={{ p: 0, minWidth: 0, textTransform: 'none', fontSize: '0.75rem' }}>
               Change Group Image
@@ -82,6 +84,13 @@ export default function ChatWindow() {
             </Button>
           )}
         </Box>
+        {chat?.isGroup && (
+          <GroupControls
+            chatId={Number(chatId)}
+            onLeave={() => navigate('/chats')}
+            onMemberAdded={() => getChat(Number(chatId)).then(setChat)}
+          />
+        )}
       </Box>
 
       <Paper sx={{ flex: 1, overflowY: 'auto', p: 2, mb: 2 }}>
@@ -95,10 +104,10 @@ export default function ChatWindow() {
               }}
             >
               {msg.senderId !== user?.id && (
-                <Avatar 
-                 src ={avatarUrl(msg.sender.avatarUrl)}
-                 sx = {{width: 32, height: 32}}
-                /> 
+                <Avatar
+                  src={avatarUrl(msg.sender.avatarUrl)}
+                  sx={{ width: 32, height: 32 }}
+                />
               )}
               <Box
                 sx={{
