@@ -8,7 +8,7 @@ export async function findById(id: number) {
 export async function findByUsername(username: string)
 {
     const res = await api.get(`/users/by-username/${username}`); 
-    return res;
+    return res.data;
 }
 
 export async function updateUsername(username: string)
