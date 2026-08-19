@@ -38,6 +38,8 @@ export default function ChatWindow() {
 
     const socket = getSocket();
 
+    if (!socket) return;
+
     const handleNewMessage = (msg: Message) => {
       if (msg.chatId === Number(chatId)) {
         setMessages((prev) => [...prev, msg]);
