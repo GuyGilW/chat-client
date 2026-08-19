@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, TextField, Button, Typography, List, ListItem, Paper, Avatar } from '@mui/material';
+import { Box, TextField, Button, Typography, List, Paper, Avatar } from '@mui/material';
 import { findAllInChat } from '../api/message';
 import { getSocket, sendMessage as socketSendMessage, joinChat, markSeen } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
-import { avatarUrl } from '../api/user';
 import { getChat, updateGroupImage } from '../api/chats';
 import { getChatDisplayInfo } from '../util/chatDisplay.ts';
 import type { Chat, Message } from '../types/types.ts'
 import GroupControls from '../components/GroupControls.tsx';
+import MessageBubble from '../components/MessageBubble';
 
 export default function ChatWindow() {
   const { chatId } = useParams();
@@ -23,10 +23,21 @@ export default function ChatWindow() {
     if (!chatId) return;
 
     getChat(Number(chatId)).then(setChat);
-    findAllInChat(Number(chatId)).then(setMessages);
+    findAllInChat(Number(chatId)).then((msgs: Message[]) => {
+      setMessages(msgs);
+      msgs.forEach((msg) => {
+        if (msg.senderId !== user?.id) {
+          const myStatus = msg.statuses.find((s) => s.userId === user?.id);
+          if (myStatus && myStatus.status !== 'SEEN') {
+            markSeen(msg.id, Number(chatId));
+          }
+        }
+      });
+    });
     joinChat(Number(chatId));
 
     const socket = getSocket();
+
     const handleNewMessage = (msg: Message) => {
       if (msg.chatId === Number(chatId)) {
         setMessages((prev) => [...prev, msg]);
@@ -36,9 +47,25 @@ export default function ChatWindow() {
       }
     };
 
+
+    const handleStatusUpdate = (status: { messageId: number; userId: number; status: 'SENT' | 'DELIVERED' | 'SEEN' }) => {
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id !== status.messageId) return msg;
+          const otherStatuses = msg.statuses.filter((s) => s.userId !== status.userId);
+          return {
+            ...msg,
+            statuses: [...otherStatuses, { id: 0, messageId: status.messageId, userId: status.userId, status: status.status }],
+          };
+        }),
+      );
+    };
+
     socket.on('newMessage', handleNewMessage);
+    socket.on('statusUpdate', handleStatusUpdate);
     return () => {
       socket.off('newMessage', handleNewMessage);
+      socket.off('statusUpdate', handleStatusUpdate)
     };
   }, [chatId, user?.id]);
 
@@ -96,37 +123,7 @@ export default function ChatWindow() {
       <Paper sx={{ flex: 1, overflowY: 'auto', p: 2, mb: 2 }}>
         <List>
           {messages.map((msg) => (
-            <ListItem
-              key={msg.id}
-              sx={{
-                justifyContent: msg.senderId === user?.id ? 'flex-end' : 'flex-start',
-                gap: 1,
-              }}
-            >
-              {msg.senderId !== user?.id && (
-                <Avatar
-                  src={avatarUrl(msg.sender.avatarUrl)}
-                  sx={{ width: 32, height: 32 }}
-                />
-              )}
-              <Box
-                sx={{
-                  bgcolor: msg.senderId === user?.id ? 'primary.main' : 'grey.200',
-                  color: msg.senderId === user?.id ? 'white' : 'black',
-                  borderRadius: 2,
-                  px: 2,
-                  py: 1,
-                  maxWidth: '70%',
-                }}
-              >
-                {msg.senderId !== user?.id && (
-                  <Typography variant="caption" sx={{ display: 'block', fontWeight: 'bold' }}>
-                    {msg.sender.username}
-                  </Typography>
-                )}
-                <Typography variant="body1">{msg.content}</Typography>
-              </Box>
-            </ListItem>
+            <MessageBubble key={msg.id} message={msg} isOwn={msg.senderId === user?.id} />
           ))}
           <div ref={bottomRef} />
         </List>

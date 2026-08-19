@@ -1,3 +1,16 @@
+// 1. As-const Object
+export const MessageStatusType = {
+  Sent: 'SENT',
+  Delivered: 'DELIVERED',
+  Seen: 'SEEN',
+} as const;
+
+
+export type MessageStatusType = (typeof MessageStatusType)[keyof typeof MessageStatusType];
+
+export const MESSAGE_STATUS_VALUES = Object.values(MessageStatusType);
+
+
 export interface UserProfile {
   id: number;
   username: string;
@@ -24,5 +37,13 @@ export interface Message {
   senderId: number;
   chatId: number;
   createdAt: string;
-  sender: { id: number; username: string; avatarUrl: string | null };
+  sender: UserProfile;
+  statuses: MessageStatus[];
+}
+
+export interface MessageStatus {
+  id: number; 
+  messageId: number; 
+  userId: number; 
+  status: MessageStatusType;
 }
